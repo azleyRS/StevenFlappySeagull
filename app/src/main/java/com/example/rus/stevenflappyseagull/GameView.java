@@ -15,6 +15,9 @@ import android.view.View;
 import java.util.Random;
 
 public class GameView extends View {
+    public static final int WIDTH = 807;
+    public static final int HEIGHT = 274;
+
 
     Handler handler;
     Runnable runnable;
@@ -22,8 +25,12 @@ public class GameView extends View {
     //later add backGround/ added
     Bitmap background;
 
-    Bitmap topTube;
-    //Bitmap bottomTube;
+    Background backgroundMovingImage;
+
+
+
+    Bitmap carrotImage;
+    //Bitmap bottomCarrot;
 
     Display display;
     Point point;
@@ -37,14 +44,14 @@ public class GameView extends View {
 
     boolean gameState = false; //testing
     int gap = 400;
-    int minTubeOffset, maxTubeOffset;
-    int numberOfTubes = 180;
-    int distanceBetweenTubes;
-    int[] tubeX = new int[numberOfTubes];
-    int[] topTubeY = new int[numberOfTubes];
+    int minCarrotOffset, maxCarrotOffset;
+    int numberOfCarrots = 180;
+    int distanceBetweenCarrots;
+    int[] carrotX = new int[numberOfCarrots];
+    int[] topCarrotY = new int[numberOfCarrots];
 
     Random random;
-    int tubeVelocity = 8;
+    int carrotVelocity = 8;
 
 
     public GameView(Context context) {
@@ -58,11 +65,13 @@ public class GameView extends View {
         };
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.testbackground);
+        backgroundMovingImage = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.testing_background));
+
 
         BitmapFactory.Options options2 = new BitmapFactory.Options();
         options2.inSampleSize = 18;
-        topTube = BitmapFactory.decodeResource(getResources(), R.drawable.carrot, options2);
-        //bottomTube = BitmapFactory.decodeResource(getResources(), R.drawable.carrot, options2);
+        carrotImage = BitmapFactory.decodeResource(getResources(), R.drawable.carrot, options2);
+        //bottomCarrot = BitmapFactory.decodeResource(getResources(), R.drawable.carrot, options2);
         // code below for background too
         display = ((AppCompatActivity)getContext()).getWindowManager().getDefaultDisplay();
         point = new Point();
@@ -81,19 +90,19 @@ public class GameView extends View {
         birdX = dWidth/8 - birds[0].getWidth()/2;
         birdY = dHeight/2-birds[0].getHeight()/2;
 
-        //distanceBetweenTubes = dWidth* 3/4;
-        //minTubeOffset = gap/2;
-        //maxTubeOffset = dHeight- minTubeOffset - gap;
-        maxTubeOffset = dHeight;
+        //distanceBetweenCarrots = dWidth* 3/4;
+        //minCarrotOffset = gap/2;
+        //maxCarrotOffset = dHeight- minCarrotOffset - gap;
+        maxCarrotOffset = dHeight;
         random = new Random();
 
-        for (int i = 0; i < numberOfTubes; i++){
-            distanceBetweenTubes = random.nextInt(dWidth/4 - dWidth/10 + 1);
-            tubeX[i] = dWidth + i*distanceBetweenTubes;
-            topTubeY[i] = minTubeOffset + random.nextInt(maxTubeOffset - 0 + 2);
+        for (int i = 0; i < numberOfCarrots; i++){
+            distanceBetweenCarrots = random.nextInt(dWidth/4 - dWidth/10 + 1);
+            carrotX[i] = dWidth + i* distanceBetweenCarrots;
+            topCarrotY[i] = minCarrotOffset + random.nextInt(maxCarrotOffset - 0 + 2);
         }
-        /*tubeX = dWidth/2 - topTube.getWidth()/2;
-        topTubeY = minTubeOffset + random.nextInt(maxTubeOffset-minTubeOffset+1);*/
+        /*carrotX = dWidth/2 - carrotImage.getWidth()/2;
+        topCarrotY = minCarrotOffset + random.nextInt(maxCarrotOffset-minCarrotOffset+1);*/
 
     }
 
@@ -102,7 +111,13 @@ public class GameView extends View {
         super.onDraw(canvas);
 
         //backgroundHere
-        canvas.drawBitmap(background,null,rect,null);
+        //canvas.drawBitmap(background,null,rect,null);
+        final int savedState = canvas.save();
+        //canvas.scale(getWidth()/WIDTH, getHeight()/HEIGHT);
+        backgroundMovingImage.draw(canvas, rect);
+        //canvas.restoreToCount(savedState);
+        backgroundMovingImage.setVecoror(-5);
+        backgroundMovingImage.update();
 
         if (birdFrame == 0){
             birdFrame = 1;
@@ -111,17 +126,17 @@ public class GameView extends View {
         }
 
         if (gameState) {
-           /* if (birdY < dHeight - birds[0].getHeight() || velocity < 0) {
+/*            if (birdY < dHeight - birds[0].getHeight() || velocity < 0) {
                 velocity += gravity; // will it work?
                 birdY += velocity;
             }*/
 
-            //canvas.drawBitmap(topTube, tubeX, topTubeY - topTube.getHeight(), null);
-            //canvas.drawBitmap(bottomTube, tubeX, topTubeY+gap, null);
-            for (int i = 0; i < numberOfTubes; i++){
-                tubeX[i] -= tubeVelocity;
-                canvas.drawBitmap(topTube, tubeX[i], topTubeY[i] - topTube.getHeight(), null);
-                //canvas.drawBitmap(bottomTube, tubeX[i], topTubeY[i] + gap, null);
+            //canvas.drawBitmap(carrotImage, carrotX, topCarrotY - carrotImage.getHeight(), null);
+            //canvas.drawBitmap(bottomCarrot, carrotX, topCarrotY+gap, null);
+            for (int i = 0; i < numberOfCarrots; i++){
+                carrotX[i] -= carrotVelocity;
+                canvas.drawBitmap(carrotImage, carrotX[i], topCarrotY[i] - carrotImage.getHeight(), null);
+                //canvas.drawBitmap(bottomCarrot, carrotX[i], topCarrotY[i] + gap, null);
             }
 
         }
@@ -134,7 +149,7 @@ public class GameView extends View {
     public boolean onTouchEvent(MotionEvent event) {
 
         int action = event.getAction();
-/*        if (action == MotionEvent.ACTION_DOWN){
+ /*       if (action == MotionEvent.ACTION_DOWN){
             velocity = -40; //testing
             gameState = true;
         }*/
